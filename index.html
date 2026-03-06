@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WedHub — Your Omnichannel Wedding Agent</title>
+  <meta name="description" content="WedHub is your premium AI-powered wedding planning companion. Seamless planning across chats, calls, and emails.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ───────────────────── Reset & Variables ───────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --white:    #FFFFFF;
+      --cream:    #FDF8F4;
+      --blush:    #F3E5DC;
+      --blush-dk: #E8CFC1;
+      --rose:     #C9A89A;
+      --gold:     #B8956A;
+      --gold-lt:  #D4B896;
+      --charcoal: #2C2825;
+      --text:     #3D3630;
+      --text-lt:  #7A706A;
+      --overlay:  rgba(44, 40, 37, .45);
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'Montserrat', 'Helvetica Neue', sans-serif;
+
+      --ease: cubic-bezier(.25, .46, .45, .94);
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      color: var(--text);
+      background: var(--cream);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    img, video { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    /* ───────────────────── Utility ───────────────────── */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); border: 0;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .8s var(--ease), transform .8s var(--ease);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ───────────────────── Navigation ───────────────────── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 1.25rem 0;
+      transition: background .4s var(--ease), padding .4s var(--ease), box-shadow .4s var(--ease);
+    }
+    .navbar.scrolled {
+      background: rgba(253, 248, 244, .92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: .75rem 0;
+      box-shadow: 0 1px 20px rgba(0,0,0,.06);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--white);
+      letter-spacing: .02em;
+      transition: color .4s var(--ease);
+    }
+    .navbar.scrolled .logo { color: var(--charcoal); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+    }
+    .nav-links a {
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.85);
+      transition: color .3s var(--ease);
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--gold);
+      transition: width .3s var(--ease);
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .navbar.scrolled .nav-links a { color: var(--text); }
+
+    .btn-login {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,.5);
+      padding: .55rem 1.4rem;
+      border-radius: 2px;
+      transition: all .3s var(--ease);
+    }
+    .btn-login:hover {
+      background: var(--white);
+      color: var(--charcoal);
+      border-color: var(--white);
+    }
+    .navbar.scrolled .btn-login {
+      color: var(--charcoal);
+      border-color: var(--charcoal);
+    }
+    .navbar.scrolled .btn-login:hover {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      width: 26px;
+    }
+    .hamburger span {
+      display: block;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: all .3s var(--ease);
+    }
+    .navbar.scrolled .hamburger span { background: var(--charcoal); }
+
+    /* ───────────────────── Hero ───────────────────── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .hero-fallback {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(44,40,37,.6) 0%, rgba(44,40,37,.25) 60%, rgba(184,149,106,.15) 100%);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      padding-left: 1rem;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp .8s var(--ease-out) .4s forwards;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      font-weight: 300;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: .5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp .8s var(--ease-out) .6s forwards;
+    }
+
+    .hero h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.15rem, 2.5vw, 1.6rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--gold-lt);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp .8s var(--ease-out) .8s forwards;
+    }
+
+    .hero p {
+      font-size: .95rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.8);
+      line-height: 1.8;
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp .8s var(--ease-out) 1s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp .8s var(--ease-out) 1.2s forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--gold-lt);
+      padding: 1rem 2.5rem;
+      border-radius: 2px;
+      transition: all .35s var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: translateY(100%);
+      transition: transform .35s var(--ease);
+    }
+    .btn-primary span { position: relative; z-index: 1; }
+    .btn-primary:hover::before { transform: translateY(0); }
+    .btn-primary:hover { color: var(--white); }
+
+    .btn-ghost {
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+      padding: .5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,.3);
+      transition: all .3s var(--ease);
+    }
+    .btn-ghost:hover {
+      color: var(--white);
+      border-color: var(--white);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .75rem;
+      opacity: 0;
+      animation: fadeUp .8s var(--ease-out) 1.6s forwards;
+    }
+    .scroll-indicator span {
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.4), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: .4; }
+      50% { opacity: 1; }
+    }
+
+    /* ───────────────────── Section Shared ───────────────────── */
+    .section {
+      padding: 7rem 0;
+    }
+
+    .section-label {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .75rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--charcoal);
+      margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+      font-size: .95rem;
+      font-weight: 300;
+      color: var(--text-lt);
+      max-width: 540px;
+      line-height: 1.8;
+    }
+
+    .divider {
+      width: 50px; height: 1px;
+      background: var(--gold);
+      margin: 1.5rem 0;
+    }
+
+    /* ───────────────────── Features ───────────────────── */
+    .features { background: var(--white); }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .features-header .section-subtitle {
+      margin: 0 auto;
+    }
+    .features-header .divider {
+      margin: 1.5rem auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: var(--cream);
+      border-radius: 4px;
+      padding: 2.5rem 2rem;
+      transition: all .4s var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s var(--ease);
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.06);
+    }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: var(--gold);
+    }
+    .feature-icon svg {
+      width: 32px; height: 32px;
+      stroke-width: 1.5;
+    }
+
+    .feature-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: .75rem;
+    }
+
+    .feature-card p {
+      font-size: .85rem;
+      font-weight: 300;
+      color: var(--text-lt);
+      line-height: 1.75;
+    }
+
+    /* ───────────────────── Workflows ───────────────────── */
+    .workflows {
+      background: var(--white);
+      overflow: hidden;
+    }
+
+    .workflows-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+    .workflows-header .section-subtitle { margin: 0 auto; }
+    .workflows-header .divider { margin: 1.5rem auto; }
+
+    .workflow-tabs {
+      display: flex;
+      justify-content: center;
+      gap: .5rem;
+      margin-bottom: 3rem;
+    }
+    .workflow-tab {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-lt);
+      background: var(--cream);
+      border: 1px solid var(--blush);
+      padding: .7rem 1.5rem;
+      border-radius: 100px;
+      transition: all .35s var(--ease);
+      cursor: pointer;
+    }
+    .workflow-tab svg {
+      width: 16px; height: 16px;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+    .workflow-tab:hover {
+      border-color: var(--gold-lt);
+      color: var(--text);
+    }
+    .workflow-tab.active {
+      background: var(--charcoal);
+      border-color: var(--charcoal);
+      color: var(--white);
+    }
+
+    .workflow-panels {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .workflow-panel {
+      display: none;
+      animation: panelFade .5s var(--ease) forwards;
+    }
+    .workflow-panel.active { display: block; }
+
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .workflow-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    /* Phone mockup */
+    .phone-mockup {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      background: var(--charcoal);
+      border-radius: 36px;
+      padding: 12px;
+      box-shadow:
+        0 25px 80px rgba(0,0,0,.12),
+        0 8px 24px rgba(0,0,0,.08),
+        inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .phone-screen {
+      background: #F2F2F7;
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+    }
+    .phone-notch {
+      width: 120px; height: 28px;
+      background: var(--charcoal);
+      border-radius: 0 0 18px 18px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .phone-header {
+      background: linear-gradient(135deg, #6B7280, #4B5563);
+      padding: .6rem 1rem .5rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-top: -6px;
+    }
+    .phone-header-back {
+      font-size: .7rem;
+      color: #60A5FA;
+    }
+    .phone-header-title {
+      flex: 1;
+      text-align: center;
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: .02em;
+    }
+    .phone-header-avatar {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--gold-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .55rem;
+      font-weight: 700;
+      color: var(--charcoal);
+    }
+
+    .chat-body {
+      padding: .75rem .75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      min-height: 320px;
+    }
+
+    .chat-date {
+      text-align: center;
+      font-size: .55rem;
+      color: #8E8E93;
+      margin: .25rem 0;
+    }
+
+    .chat-bubble {
+      max-width: 82%;
+      padding: .55rem .8rem;
+      border-radius: 16px;
+      font-size: .72rem;
+      line-height: 1.45;
+      position: relative;
+      animation: bubbleIn .4s var(--ease-out) both;
+    }
+    .chat-bubble:nth-child(2) { animation-delay: .1s; }
+    .chat-bubble:nth-child(3) { animation-delay: .2s; }
+    .chat-bubble:nth-child(4) { animation-delay: .3s; }
+    .chat-bubble:nth-child(5) { animation-delay: .4s; }
+    .chat-bubble:nth-child(6) { animation-delay: .5s; }
+    .chat-bubble:nth-child(7) { animation-delay: .6s; }
+    .chat-bubble:nth-child(8) { animation-delay: .7s; }
+    .chat-bubble:nth-child(9) { animation-delay: .8s; }
+
+    @keyframes bubbleIn {
+      from { opacity: 0; transform: translateY(8px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .chat-bubble.sent {
+      align-self: flex-end;
+      background: #007AFF;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-bubble.received {
+      align-self: flex-start;
+      background: #E5E5EA;
+      color: #1C1C1E;
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble.roger {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #F9F1E8, #F3E5D8);
+      color: var(--charcoal);
+      border: 1px solid var(--blush-dk);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-bubble.roger .roger-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+      font-size: .55rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .2rem;
+    }
+    .chat-bubble.roger .roger-badge svg {
+      width: 10px; height: 10px;
+    }
+    .chat-bubble.system {
+      align-self: center;
+      background: transparent;
+      font-size: .6rem;
+      color: #8E8E93;
+      text-align: center;
+      font-style: italic;
+      padding: .3rem;
+    }
+
+    .chat-input-bar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem .75rem;
+      border-top: 1px solid #E5E5EA;
+      background: #F9F9F9;
+    }
+    .chat-input-bar .chat-input-field {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #E5E5EA;
+      border-radius: 18px;
+      padding: .4rem .75rem;
+      font-size: .65rem;
+      color: #8E8E93;
+    }
+    .chat-input-bar .chat-send {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #007AFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chat-input-bar .chat-send svg {
+      width: 12px; height: 12px;
+      color: white;
+    }
+
+    /* Email mockup */
+    .email-mockup {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow:
+        0 25px 80px rgba(0,0,0,.1),
+        0 8px 24px rgba(0,0,0,.06),
+        0 0 0 1px rgba(0,0,0,.04);
+      overflow: hidden;
+    }
+    .email-toolbar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .6rem 1rem;
+      background: #F5F5F5;
+      border-bottom: 1px solid #E8E8E8;
+    }
+    .email-toolbar-dots {
+      display: flex;
+      gap: 5px;
+    }
+    .email-toolbar-dots span {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .email-toolbar-dots span:nth-child(1) { background: #FF5F57; }
+    .email-toolbar-dots span:nth-child(2) { background: #FFBD2E; }
+    .email-toolbar-dots span:nth-child(3) { background: #28C840; }
+    .email-toolbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: .65rem;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .email-header-area {
+      padding: 1.25rem 1.25rem .75rem;
+      border-bottom: 1px solid #F0F0F0;
+    }
+    .email-subject {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: .75rem;
+    }
+    .email-meta {
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
+    .email-meta-row {
+      display: flex;
+      align-items: baseline;
+      gap: .5rem;
+      font-size: .65rem;
+      line-height: 1.4;
+    }
+    .email-meta-label {
+      font-weight: 600;
+      color: #999;
+      min-width: 28px;
+      text-align: right;
+    }
+    .email-meta-value {
+      color: var(--text);
+    }
+    .email-meta-value .roger-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: .2rem;
+      background: linear-gradient(135deg, #F9F1E8, #F3E5D8);
+      border: 1px solid var(--blush-dk);
+      border-radius: 3px;
+      padding: .1rem .4rem;
+      font-size: .6rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .email-meta-value .roger-tag svg {
+      width: 8px; height: 8px;
+    }
+
+    .email-body-area {
+      padding: 1.25rem;
+      font-size: .75rem;
+      line-height: 1.7;
+      color: var(--text);
+      min-height: 200px;
+    }
+    .email-body-area p {
+      margin-bottom: .75rem;
+    }
+    .email-body-area .email-signature {
+      margin-top: 1rem;
+      padding-top: .75rem;
+      border-top: 1px solid #F0F0F0;
+      color: #999;
+      font-size: .65rem;
+    }
+
+    .email-roger-reply {
+      margin: 0 1.25rem 1.25rem;
+      background: linear-gradient(135deg, #FDFAF6, #F9F1E8);
+      border: 1px solid var(--blush-dk);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .email-roger-reply .roger-reply-header {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .5rem;
+    }
+    .email-roger-reply .roger-avatar-sm {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--gold-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .55rem;
+      font-weight: 700;
+      color: var(--charcoal);
+    }
+    .email-roger-reply .roger-reply-name {
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .email-roger-reply .roger-reply-time {
+      font-size: .55rem;
+      color: var(--rose);
+      margin-left: auto;
+    }
+    .email-roger-reply p {
+      font-size: .7rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+
+    /* Call mockup */
+    .call-mockup {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      background: var(--charcoal);
+      border-radius: 36px;
+      padding: 12px;
+      box-shadow:
+        0 25px 80px rgba(0,0,0,.12),
+        0 8px 24px rgba(0,0,0,.08),
+        inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .call-screen {
+      background: linear-gradient(180deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+      border-radius: 26px;
+      overflow: hidden;
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .call-screen .call-notch {
+      width: 120px; height: 28px;
+      background: var(--charcoal);
+      border-radius: 0 0 18px 18px;
+      margin: -2.5rem auto 2rem;
+    }
+    .call-avatar-ring {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 2px solid var(--gold-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      animation: callPulse 2s ease-in-out infinite;
+    }
+    @keyframes callPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(212,184,150,.3); }
+      50%      { box-shadow: 0 0 0 16px rgba(212,184,150,0); }
+    }
+    .call-avatar-ring .call-avatar-inner {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+    .call-name {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 400;
+      color: var(--white);
+      margin-bottom: .25rem;
+    }
+    .call-status {
+      font-size: .7rem;
+      font-weight: 400;
+      color: rgba(255,255,255,.5);
+      letter-spacing: .05em;
+      margin-bottom: .5rem;
+    }
+    .call-timer {
+      font-size: .85rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.8);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: auto;
+    }
+    .call-transcript {
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      border-radius: 12px;
+      padding: .75rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .call-transcript-label {
+      font-size: .5rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: .4rem;
+    }
+    .call-transcript p {
+      font-size: .6rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,.65);
+    }
+    .call-transcript .highlight {
+      color: var(--gold-lt);
+      font-weight: 500;
+    }
+    .call-actions {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .call-action-btn {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .2s var(--ease);
+    }
+    .call-action-btn:hover { transform: scale(1.08); }
+    .call-action-btn svg { width: 22px; height: 22px; }
+    .call-action-btn.mute   { background: rgba(255,255,255,.15); color: white; }
+    .call-action-btn.end    { background: #FF3B30; color: white; }
+    .call-action-btn.speaker { background: rgba(255,255,255,.15); color: white; }
+
+    /* Workflow explanation text */
+    .workflow-explain {
+      padding: .5rem 0;
+    }
+    .workflow-explain .section-label {
+      margin-bottom: .5rem;
+    }
+    .workflow-explain h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 400;
+      color: var(--charcoal);
+      line-height: 1.25;
+      margin-bottom: 1rem;
+    }
+    .workflow-explain p {
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--text-lt);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      max-width: 440px;
+    }
+
+    .workflow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: .5rem;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--cream);
+      border: 1px solid var(--blush-dk);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      font-weight: 600;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .step-text {
+      font-size: .82rem;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.6;
+      padding-top: .2rem;
+    }
+    .step-text strong {
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    @media (max-width: 768px) {
+      .workflow-tabs { flex-wrap: wrap; }
+      .workflow-showcase {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+      .workflow-showcase .workflow-explain { order: -1; }
+      .phone-mockup, .email-mockup, .call-mockup { max-width: 300px; }
+    }
+
+    @media (max-width: 480px) {
+      .workflow-tab { padding: .55rem 1rem; font-size: .65rem; }
+    }
+
+    /* ───────────────────── About Roger ───────────────────── */
+    .about-roger {
+      background: var(--cream);
+      overflow: hidden;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-image-wrap {
+      position: relative;
+    }
+    .about-image-wrap::before {
+      content: '';
+      position: absolute;
+      top: -20px; left: -20px;
+      width: 100%; height: 100%;
+      border: 1px solid var(--gold-lt);
+      border-radius: 4px;
+      z-index: 0;
+    }
+    .about-image {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      background: linear-gradient(135deg, var(--blush) 0%, var(--blush-dk) 100%);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-image-placeholder {
+      text-align: center;
+      padding: 2rem;
+    }
+    .about-image-placeholder svg {
+      width: 80px; height: 80px;
+      color: var(--rose);
+      margin-bottom: 1rem;
+      opacity: .6;
+    }
+    .about-image-placeholder span {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-style: italic;
+      color: var(--rose);
+      opacity: .8;
+    }
+
+    .about-text .section-subtitle {
+      margin-bottom: 2rem;
+    }
+
+    .about-qualities {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .quality {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: .85rem;
+      font-weight: 400;
+      color: var(--text);
+    }
+    .quality-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ───────────────────── Inquire / Contact ───────────────────── */
+    .inquire {
+      background: var(--charcoal);
+      color: var(--white);
+      position: relative;
+    }
+    .inquire::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .inquire-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+    }
+
+    .inquire-info .section-label { color: var(--gold-lt); }
+    .inquire-info .section-title { color: var(--white); }
+    .inquire-info .section-subtitle { color: rgba(255,255,255,.55); }
+    .inquire-info .divider { background: var(--gold); }
+
+    .inquire-details {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .inquire-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .inquire-detail svg {
+      width: 20px; height: 20px;
+      color: var(--gold-lt);
+      flex-shrink: 0;
+      margin-top: 2px;
+      stroke-width: 1.5;
+    }
+    .inquire-detail p {
+      font-size: .85rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.7);
+      line-height: 1.6;
+    }
+    .inquire-detail strong {
+      display: block;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+      margin-bottom: .25rem;
+    }
+
+    .form-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 4px;
+      padding: 2.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.4);
+      margin-bottom: .5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      font-weight: 300;
+      color: var(--white);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 2px;
+      padding: .85rem 1rem;
+      transition: all .3s var(--ease);
+      outline: none;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(255,255,255,.25);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+      background: rgba(255,255,255,.08);
+    }
+    .form-group textarea {
+      height: 120px;
+      resize: vertical;
+    }
+
+    .btn-submit {
+      width: 100%;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      background: var(--gold-lt);
+      padding: 1.1rem;
+      border-radius: 2px;
+      transition: all .35s var(--ease);
+      margin-top: .5rem;
+    }
+    .btn-submit:hover {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    /* ───────────────────── Login Modal ───────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(44, 40, 37, .7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .35s var(--ease);
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--cream);
+      border-radius: 4px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 420px;
+      transform: translateY(20px) scale(.97);
+      transition: transform .35s var(--ease);
+      position: relative;
+    }
+    .modal-overlay.active .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem; right: 1.25rem;
+      width: 32px; height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-lt);
+      transition: color .3s var(--ease);
+    }
+    .modal-close:hover { color: var(--charcoal); }
+    .modal-close svg { width: 18px; height: 18px; }
+
+    .modal h3 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--charcoal);
+      margin-bottom: .5rem;
+    }
+    .modal p {
+      font-size: .85rem;
+      font-weight: 300;
+      color: var(--text-lt);
+      margin-bottom: 2rem;
+    }
+
+    .modal .form-group label { color: var(--text-lt); }
+    .modal .form-group input {
+      color: var(--charcoal);
+      background: var(--white);
+      border-color: var(--blush-dk);
+    }
+    .modal .form-group input::placeholder { color: var(--rose); }
+    .modal .form-group input:focus {
+      border-color: var(--gold);
+      background: var(--white);
+    }
+
+    .modal .btn-submit {
+      color: var(--white);
+      background: var(--charcoal);
+    }
+    .modal .btn-submit:hover {
+      background: var(--gold);
+    }
+
+    .modal-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: .8rem;
+      color: var(--text-lt);
+    }
+    .modal-footer a {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* ───────────────────── Footer ───────────────────── */
+    .footer {
+      background: #1E1B19;
+      padding: 4rem 0 2.5rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .footer-brand .logo {
+      color: var(--white);
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+    .footer-brand p {
+      font-size: .85rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.4);
+      line-height: 1.7;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 1.25rem;
+    }
+    .footer-col a {
+      display: block;
+      font-size: .85rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.55);
+      padding: .3rem 0;
+      transition: color .3s var(--ease);
+    }
+    .footer-col a:hover { color: var(--gold-lt); }
+
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .3s var(--ease);
+    }
+    .footer-social a:hover {
+      border-color: var(--gold);
+      background: rgba(184,149,106,.1);
+    }
+    .footer-social svg {
+      width: 16px; height: 16px;
+      color: rgba(255,255,255,.5);
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2rem;
+    }
+    .footer-bottom p {
+      font-size: .75rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.25);
+    }
+    .footer-legal {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .footer-legal a {
+      font-size: .75rem;
+      font-weight: 300;
+      color: rgba(255,255,255,.25);
+      transition: color .3s var(--ease);
+    }
+    .footer-legal a:hover { color: rgba(255,255,255,.5); }
+
+    /* ───────────────────── Mobile Nav Drawer ───────────────────── */
+    .mobile-nav {
+      position: fixed;
+      top: 0; right: 0;
+      width: 100%; max-width: 360px;
+      height: 100vh;
+      background: var(--cream);
+      z-index: 1500;
+      padding: 6rem 2.5rem 2.5rem;
+      transform: translateX(100%);
+      transition: transform .4s var(--ease-out);
+    }
+    .mobile-nav.open { transform: translateX(0); }
+    .mobile-nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(44,40,37,.5);
+      z-index: 1400;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s var(--ease);
+    }
+    .mobile-nav-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .mobile-nav a {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--charcoal);
+      padding: .75rem 0;
+      border-bottom: 1px solid var(--blush);
+      transition: color .3s var(--ease);
+    }
+    .mobile-nav a:hover { color: var(--gold); }
+
+    .mobile-nav-close {
+      position: absolute;
+      top: 1.5rem; right: 1.5rem;
+      width: 40px; height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--charcoal);
+    }
+    .mobile-nav-close svg { width: 22px; height: 22px; }
+
+    /* ───────────────────── Responsive ───────────────────── */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-grid { gap: 3rem; }
+      .inquire-grid { gap: 3rem; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .btn-login-nav { display: none; }
+      .hamburger { display: flex; }
+
+      .hero-content { max-width: 100%; }
+
+      .features-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .about-image-wrap { max-width: 400px; }
+
+      .inquire-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .form-row { grid-template-columns: 1fr; }
+
+      .footer-top {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+
+      .section { padding: 5rem 0; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 1.25rem; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+      .form-card { padding: 1.75rem; }
+      .modal { margin: 1rem; padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ Navigation ════════ -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container">
+      <a href="#" class="logo" aria-label="WedHub Home">WedHub</a>
+      <ul class="nav-links" role="menubar">
+        <li role="none"><a href="#hero" role="menuitem">Home</a></li>
+        <li role="none"><a href="#features" role="menuitem">Features</a></li>
+        <li role="none"><a href="#workflows" role="menuitem">How It Works</a></li>
+        <li role="none"><a href="#about" role="menuitem">About</a></li>
+        <li role="none"><a href="#inquire" role="menuitem">Contact</a></li>
+      </ul>
+      <button class="btn-login btn-login-nav" aria-label="Open login dialog" id="loginBtn">Log In</button>
+      <button class="hamburger" aria-label="Open menu" aria-expanded="false" id="hamburgerBtn">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="mobile-nav-overlay" id="mobileOverlay" aria-hidden="true"></div>
+  <div class="mobile-nav" id="mobileNav" role="dialog" aria-label="Mobile navigation">
+    <button class="mobile-nav-close" aria-label="Close menu" id="mobileClose">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <a href="#hero">Home</a>
+    <a href="#features">Features</a>
+    <a href="#workflows">How It Works</a>
+    <a href="#about">About</a>
+    <a href="#inquire">Contact</a>
+    <a href="#" id="mobileLoginBtn" style="color: var(--gold); border: none; margin-top: 1rem; font-size: 1.5rem;">Log In</a>
+  </div>
+
+  <!-- ════════ Hero ════════ -->
+  <section class="hero" id="hero" aria-label="Hero">
+    <!-- Background video — replace src with your own stock wedding video -->
+    <video
+      class="hero-video"
+      autoplay loop muted playsinline
+      poster="https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80"
+      aria-hidden="true"
+    >
+      <source src="https://videos.pexels.com/video-files/3337232/3337232-uhd_2560_1440_30fps.mp4" type="video/mp4">
+    </video>
+    <img
+      class="hero-fallback"
+      src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80"
+      alt=""
+      aria-hidden="true"
+      style="display:none;"
+    >
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="hero-content">
+        <p class="hero-eyebrow">Introducing WedHub</p>
+        <h1>Meet Roger</h1>
+        <h2>Your Omnichannel Wedding Whisperer</h2>
+        <p>Seamless planning across chats, calls, and emails. Discover, organize, and celebrate your perfect day — all in one effortless experience.</p>
+        <div class="hero-actions">
+          <a href="#inquire" class="btn-primary"><span>Inquire Now</span></a>
+          <a href="#features" class="btn-ghost">Explore Features</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ════════ Features ════════ -->
+  <section class="section features" id="features" aria-label="Features">
+    <div class="container">
+      <div class="features-header reveal">
+        <p class="section-label">Why WedHub</p>
+        <h2 class="section-title">Everything You Need,<br>Beautifully Unified</h2>
+        <div class="divider"></div>
+        <p class="section-subtitle">From the first "yes" to the last dance, Roger keeps every detail organized across every channel.</p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Card 1 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+          </div>
+          <h3>Omnichannel Conversations</h3>
+          <p>Chat, text, call, or email — Roger captures it all in one unified timeline so nothing gets lost between you, your partner, and your vendors.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </div>
+          <h3>Smart Discovery</h3>
+          <p>Tell Roger your vision and watch as curated vendor recommendations, venue comparisons, and inspiration boards appear like magic.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3>Effortless Organization</h3>
+          <p>Budgets, timelines, guest lists, and seating charts — all managed intelligently. Roger adapts as your plans evolve.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="feature-card reveal">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path d="M9 18l6-6-6-6"/>
+              <path d="M4 12a8 8 0 018-8"/>
+              <path d="M20 12a8 8 0 01-8 8"/>
+            </svg>
+          </div>
+          <h3>Seamless Handoffs</h3>
+          <p>Start a conversation on your phone, continue on your laptop, and pick up right where you left off — context always preserved.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ Workflows ════════ -->
+  <section class="section workflows" id="workflows" aria-label="How it works">
+    <div class="container">
+      <div class="workflows-header reveal">
+        <p class="section-label">How It Works</p>
+        <h2 class="section-title">Add Roger to Any Conversation</h2>
+        <div class="divider"></div>
+        <p class="section-subtitle">Text thread, email chain, or phone call — just loop Roger in and he takes it from there.</p>
+      </div>
+
+      <div class="workflow-tabs reveal" role="tablist" aria-label="Workflow channels">
+        <button class="workflow-tab active" role="tab" aria-selected="true" aria-controls="panel-text" data-tab="text">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Text Thread
+        </button>
+        <button class="workflow-tab" role="tab" aria-selected="false" aria-controls="panel-email" data-tab="email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Thread
+        </button>
+        <button class="workflow-tab" role="tab" aria-selected="false" aria-controls="panel-call" data-tab="call">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          Phone Call
+        </button>
+      </div>
+
+      <div class="workflow-panels">
+
+        <!-- ── Text Thread Panel ── -->
+        <div class="workflow-panel active" id="panel-text" role="tabpanel">
+          <div class="workflow-showcase">
+            <div class="phone-mockup">
+              <div class="phone-screen">
+                <div class="phone-notch"></div>
+                <div class="phone-header">
+                  <span class="phone-header-back">‹</span>
+                  <span class="phone-header-title">Wedding Planning 💍</span>
+                  <div class="phone-header-avatar">3</div>
+                </div>
+                <div class="chat-body">
+                  <div class="chat-date">Today 2:14 PM</div>
+                  <div class="chat-bubble sent">I found this amazing florist in Brooklyn — should we book a tasting?</div>
+                  <div class="chat-bubble received">Omg yes! But can we afford it with the venue deposit coming up?</div>
+                  <div class="chat-bubble sent">Good point. Let me add Roger so he can figure this out</div>
+                  <div class="chat-bubble system">You added Roger to the conversation</div>
+                  <div class="chat-bubble roger">
+                    <div class="roger-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                      Roger
+                    </div>
+                    Hey loves! Great taste — Bloom & Co is gorgeous. You've got $2,400 left in the floral budget and the venue deposit isn't due until April 15. I'd say go for the tasting! Want me to schedule it?
+                  </div>
+                  <div class="chat-bubble sent">Yes please!! 🙌</div>
+                  <div class="chat-bubble roger">
+                    <div class="roger-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                      Roger
+                    </div>
+                    Done! March 22 at 11am. I'll send you both a calendar invite. 💐
+                  </div>
+                </div>
+                <div class="chat-input-bar">
+                  <div class="chat-input-field">iMessage</div>
+                  <div class="chat-send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="workflow-explain">
+              <p class="section-label">Text Thread</p>
+              <h3>Add Roger to Any<br>Group Chat</h3>
+              <p>Just add Roger's number to your existing text thread with your partner, your wedding party, or even a vendor. He instantly picks up context, checks your budget, and takes action.</p>
+              <div class="workflow-steps">
+                <div class="workflow-step">
+                  <div class="step-num">1</div>
+                  <div class="step-text"><strong>Add Roger's number</strong> to any iMessage, WhatsApp, or SMS group thread</div>
+                </div>
+                <div class="workflow-step">
+                  <div class="step-num">2</div>
+                  <div class="step-text"><strong>Roger reads the context</strong> — he understands what you're discussing and references your plans</div>
+                </div>
+                <div class="workflow-step">
+                  <div class="step-num">3</div>
+                  <div class="step-text"><strong>He takes action</strong> — books appointments, checks budgets, sends reminders, and follows up</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Email Thread Panel ── -->
+        <div class="workflow-panel" id="panel-email" role="tabpanel">
+          <div class="workflow-showcase">
+            <div class="email-mockup">
+              <div class="email-toolbar">
+                <div class="email-toolbar-dots"><span></span><span></span><span></span></div>
+                <span class="email-toolbar-title">Mail — Wedding Planning</span>
+                <span></span>
+              </div>
+              <div class="email-header-area">
+                <div class="email-subject">Re: Catering Menu Options for Sept 12</div>
+                <div class="email-meta">
+                  <div class="email-meta-row">
+                    <span class="email-meta-label">From</span>
+                    <span class="email-meta-value">Sarah Chen &lt;sarah@bluebirdcatering.com&gt;</span>
+                  </div>
+                  <div class="email-meta-row">
+                    <span class="email-meta-label">To</span>
+                    <span class="email-meta-value">Jane &amp; Alex</span>
+                  </div>
+                  <div class="email-meta-row">
+                    <span class="email-meta-label">CC</span>
+                    <span class="email-meta-value">
+                      <span class="roger-tag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                        roger@wedhub.ca
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="email-body-area">
+                <p>Hi Jane & Alex,</p>
+                <p>Thanks for coming by the tasting yesterday! Attached are the three menu packages we discussed. The Farm-to-Table option includes the seasonal appetizers you loved.</p>
+                <p>Let me know which direction you'd like to go — happy to customize anything. We'd need final selections by August 1st.</p>
+                <div class="email-signature">
+                  Sarah Chen · Bluebird Catering<br>
+                  (555) 234-5678
+                </div>
+              </div>
+              <div class="email-roger-reply">
+                <div class="roger-reply-header">
+                  <div class="roger-avatar-sm">R</div>
+                  <span class="roger-reply-name">Roger via WedHub</span>
+                  <span class="roger-reply-time">Just now</span>
+                </div>
+                <p>I've saved all three menu PDFs to your WedHub dashboard and compared pricing against your catering budget ($8,500). The Farm-to-Table is $7,800 — leaves you $700 for a late-night snack station! I've also flagged the Aug 1 deadline on your shared timeline. 📋</p>
+              </div>
+            </div>
+
+            <div class="workflow-explain">
+              <p class="section-label">Email Thread</p>
+              <h3>CC Roger on<br>Any Email</h3>
+              <p>Forward or CC roger@wedhub.ca on vendor emails, venue contracts, or planning threads. He extracts key details, updates your dashboard, and tracks deadlines automatically.</p>
+              <div class="workflow-steps">
+                <div class="workflow-step">
+                  <div class="step-num">1</div>
+                  <div class="step-text"><strong>CC roger@wedhub.ca</strong> on any vendor email, contract, or planning thread</div>
+                </div>
+                <div class="workflow-step">
+                  <div class="step-num">2</div>
+                  <div class="step-text"><strong>Roger parses everything</strong> — menus, pricing, deadlines, attachments all get organized</div>
+                </div>
+                <div class="workflow-step">
+                  <div class="step-num">3</div>
+                  <div class="step-text"><strong>Your dashboard updates</strong> — budgets, timelines, and vendor files stay current without lifting a finger</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Phone Call Panel ── -->
+        <div class="workflow-panel" id="panel-call" role="tabpanel">
+          <div class="workflow-showcase">
+            <div class="call-mockup">
+              <div class="call-screen">
+                <div class="call-notch"></div>
+                <div class="call-avatar-ring">
+                  <div class="call-avatar-inner">R</div>
+                </div>
+                <div class="call-name">Roger</div>
+                <div class="call-status">WedHub Assistant</div>
+                <div class="call-timer">04:32</div>
+                <div class="call-transcript">
+                  <div class="call-transcript-label">Live Transcript</div>
+                  <p><span class="highlight">You:</span> Hey Roger, the DJ just called and wants to know our must-play list by Friday.</p>
+                  <p style="margin-top:.3rem"><span class="highlight">Roger:</span> On it! I see you and Alex saved 34 songs on your WedHub playlist. I'll send the DJ your list tonight and flag any gaps — you're missing a first dance pick, by the way. Want some suggestions?</p>
+                </div>
+                <div class="call-actions">
+                  <button class="call-action-btn mute" aria-label="Mute">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                  </button>
+                  <button class="call-action-btn end" aria-label="End call">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+                  </button>
+                  <button class="call-action-btn speaker" aria-label="Speaker">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="workflow-explain">
+              <p class="section-label">Phone Call</p>
+              <h3>Call Roger<br>Anytime</h3>
+              <p>Dial Roger's dedicated number when you need quick answers, brainstorming, or hands-free planning while you're on the go. He speaks naturally and takes notes for you.</p>
+              <div class="workflow-steps">
+                <div class="workflow-step">
+                  <div class="step-num">1</div>
+                  <div class="step-text"><strong>Call Roger's number</strong> — he picks up instantly, day or night, ready to help</div>
+                </div>
+                <div class="workflow-step">
+                  <div class="step-num">2</div>
+                  <div class="step-text"><strong>Talk naturally</strong> — ask questions, brainstorm ideas, or give him tasks while driving, cooking, or decompressing</div>
+                </div>
+                <div class="workflow-step">
+                  <div class="step-num">3</div>
+                  <div class="step-text"><strong>Everything is captured</strong> — call summaries, action items, and decisions sync to your dashboard</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ About Roger ════════ -->
+  <section class="section about-roger" id="about" aria-label="About Roger">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image-wrap reveal">
+          <div class="about-image">
+            <div class="about-image-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+              </svg>
+              <span>Roger</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-text reveal">
+          <p class="section-label">Meet Your Agent</p>
+          <h2 class="section-title">Roger Is Unlike Any<br>Wedding Planner</h2>
+          <div class="divider"></div>
+          <p class="section-subtitle">Roger is your dedicated wedding guide — equal parts impeccable taste, tireless organizer, and trusted confidant. From vendor discovery to playlist curation, he handles every detail with flair and precision so you can focus on what truly matters.</p>
+          <p class="section-subtitle" style="margin-top: 1rem;">Think of Roger as that impossibly stylish friend who always knows the best florist in town, remembers every deadline, and somehow makes the entire process feel effortless.</p>
+          <div class="about-qualities">
+            <div class="quality"><span class="quality-dot"></span>Vendor Negotiations</div>
+            <div class="quality"><span class="quality-dot"></span>Budget Tracking</div>
+            <div class="quality"><span class="quality-dot"></span>Guest Management</div>
+            <div class="quality"><span class="quality-dot"></span>Timeline Planning</div>
+            <div class="quality"><span class="quality-dot"></span>Playlist Curation</div>
+            <div class="quality"><span class="quality-dot"></span>Day-of Coordination</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ Inquire ════════ -->
+  <section class="section inquire" id="inquire" aria-label="Contact and Inquire">
+    <div class="container">
+      <div class="inquire-grid">
+        <div class="inquire-info reveal">
+          <p class="section-label">Get in Touch</p>
+          <h2 class="section-title">Let's Start Planning<br>Your Perfect Day</h2>
+          <div class="divider"></div>
+          <p class="section-subtitle">Ready to meet Roger? Fill out the form and our team will reach out within 24 hours to begin your personalized wedding journey.</p>
+
+          <div class="inquire-details">
+            <div class="inquire-detail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <p><strong>Email</strong>hello@wedhub.ca</p>
+            </div>
+            <div class="inquire-detail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              <p><strong>Location</strong>Vancouver, BC</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="form-card">
+            <form id="inquiryForm" aria-label="Inquiry form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Your Name</label>
+                  <input type="text" id="name" name="name" placeholder="Jane Doe" autocomplete="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email Address</label>
+                  <input type="email" id="email" name="email" placeholder="jane@example.com" autocomplete="email" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="date">Wedding Date</label>
+                <input type="date" id="date" name="date">
+              </div>
+              <div class="form-group">
+                <label for="message">Tell Us About Your Vision</label>
+                <textarea id="message" name="message" placeholder="Describe your dream wedding…"></textarea>
+              </div>
+              <button type="submit" class="btn-submit">Send Inquiry</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ Footer ════════ -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="logo">WedHub</a>
+          <p>Premium AI-powered wedding planning. Let Roger handle the details while you live the dream.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" aria-label="Pinterest">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.25 2.67 7.9 6.44 9.34-.09-.78-.17-1.98.03-2.83.19-.77 1.22-5.18 1.22-5.18s-.31-.63-.31-1.55c0-1.45.84-2.53 1.89-2.53.89 0 1.32.67 1.32 1.47 0 .9-.57 2.24-.87 3.48-.25 1.05.52 1.91 1.55 1.91 1.86 0 3.29-1.96 3.29-4.8 0-2.51-1.8-4.26-4.38-4.26-2.98 0-4.74 2.24-4.74 4.55 0 .9.35 1.87.78 2.4.09.11.1.2.07.31-.08.31-.25 1.05-.29 1.19-.05.2-.16.24-.37.14-1.39-.64-2.26-2.67-2.26-4.3 0-3.5 2.54-6.71 7.33-6.71 3.85 0 6.84 2.74 6.84 6.4 0 3.82-2.41 6.9-5.76 6.9-1.12 0-2.18-.58-2.54-1.27l-.69 2.63c-.25.96-.93 2.17-1.38 2.9C10.26 21.86 11.11 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            </a>
+            <a href="#" aria-label="Twitter / X">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 4l11.73 16H20L8.27 4H4z"/><path d="M4 20l6.77-8.5"/><path d="M20 4l-6.77 8.5"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Careers</a>
+          <a href="#">Press</a>
+          <a href="#">Blog</a>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="#">Features</a>
+          <a href="#">Pricing</a>
+          <a href="#">Integrations</a>
+          <a href="#">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Help Center</a>
+          <a href="#">Contact Us</a>
+          <a href="#">Status</a>
+          <a href="#">Accessibility</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 WedHub. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ════════ Login Modal ════════ -->
+  <div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true" aria-label="Login">
+    <div class="modal">
+      <button class="modal-close" aria-label="Close login" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <h3>Welcome Back</h3>
+      <p>Sign in to your WedHub account to continue planning.</p>
+      <form aria-label="Login form" id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-submit">Sign In</button>
+      </form>
+      <p class="modal-footer">Don't have an account? <a href="#inquire" id="modalToInquire">Get started</a></p>
+    </div>
+  </div>
+
+  <!-- ════════ JavaScript ════════ -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Navbar scroll effect ── */
+      const navbar = document.querySelector('.navbar');
+      const onScroll = () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 60);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* ── Video fallback ── */
+      const video = document.querySelector('.hero-video');
+      const fallback = document.querySelector('.hero-fallback');
+      if (video) {
+        video.addEventListener('error', function () {
+          video.style.display = 'none';
+          if (fallback) fallback.style.display = 'block';
+        });
+        const source = video.querySelector('source');
+        if (source) {
+          source.addEventListener('error', function () {
+            video.style.display = 'none';
+            if (fallback) fallback.style.display = 'block';
+          });
+        }
+      }
+
+      /* ── Reveal on scroll (Intersection Observer) ── */
+      const reveals = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        reveals.forEach(function (el) { observer.observe(el); });
+      } else {
+        reveals.forEach(function (el) { el.classList.add('visible'); });
+      }
+
+      /* ── Mobile nav ── */
+      const hamburger = document.getElementById('hamburgerBtn');
+      const mobileNav = document.getElementById('mobileNav');
+      const mobileOverlay = document.getElementById('mobileOverlay');
+      const mobileClose = document.getElementById('mobileClose');
+
+      function openMobileNav() {
+        mobileNav.classList.add('open');
+        mobileOverlay.classList.add('open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeMobileNav() {
+        mobileNav.classList.remove('open');
+        mobileOverlay.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      hamburger.addEventListener('click', openMobileNav);
+      mobileClose.addEventListener('click', closeMobileNav);
+      mobileOverlay.addEventListener('click', closeMobileNav);
+      mobileNav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMobileNav);
+      });
+
+      /* ── Login modal ── */
+      const modal = document.getElementById('loginModal');
+      const loginBtn = document.getElementById('loginBtn');
+      const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+      const modalCloseBtn = document.getElementById('modalClose');
+      const modalToInquire = document.getElementById('modalToInquire');
+
+      function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        closeMobileNav();
+      }
+      function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      loginBtn.addEventListener('click', openModal);
+      mobileLoginBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openModal();
+      });
+      modalCloseBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+      modalToInquire.addEventListener('click', function () {
+        closeModal();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeModal();
+          closeMobileNav();
+        }
+      });
+
+      /* ── Mock form submissions ── */
+      document.getElementById('inquiryForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var btn = this.querySelector('.btn-submit');
+        var original = btn.textContent;
+        btn.textContent = 'Sent — We\'ll Be in Touch!';
+        btn.style.background = '#7a9e7e';
+        btn.style.color = '#fff';
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 3000);
+      });
+
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var btn = this.querySelector('.btn-submit');
+        btn.textContent = 'Signing in…';
+        setTimeout(function () {
+          btn.textContent = 'Sign In';
+          closeModal();
+        }, 1500);
+      });
+
+      /* ── Workflow tabs ── */
+      var tabs = document.querySelectorAll('.workflow-tab');
+      var panels = document.querySelectorAll('.workflow-panel');
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var target = this.getAttribute('data-tab');
+
+          tabs.forEach(function (t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          this.classList.add('active');
+          this.setAttribute('aria-selected', 'true');
+
+          panels.forEach(function (p) {
+            p.classList.remove('active');
+            p.style.animation = 'none';
+          });
+
+          var panel = document.getElementById('panel-' + target);
+          if (panel) {
+            // Force reflow so the animation replays
+            void panel.offsetWidth;
+            panel.style.animation = '';
+            panel.classList.add('active');
+          }
+        });
+      });
+
+      /* ── Smooth scroll for anchor links ── */
+      document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
